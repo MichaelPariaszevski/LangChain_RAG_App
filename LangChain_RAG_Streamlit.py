@@ -42,7 +42,7 @@ def chunk_data(data, chunk_size=256, chunk_overlap=20):
 
 
 def create_embeddings(chunks): 
-    embeddings=OpenAIEmbeddings() 
+    embeddings=OpenAIEmbeddings(model="text-embedding-3-small") 
     vector_store=Chroma.from_documents(chunks, embeddings) 
     return vector_store
 
@@ -50,7 +50,7 @@ def create_embeddings(chunks):
 def ask_and_get_answer(vector_store, q, k=3): 
     from langchain.chains import RetrievalQA
     from langchain_openai import ChatOpenAI 
-    llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=1) 
+    llm=ChatOpenAI(model="gpt-4o-mini", temperature=1) 
     retriever=vector_store.as_retriever(search_type="similarity", search_kwargs={"k": k}) 
     chain=RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever) 
     answer=chain.invoke(q) 
@@ -59,7 +59,7 @@ def ask_and_get_answer(vector_store, q, k=3):
 
 def calculate_embedding_cost(texts): 
     import tiktoken 
-    enc=tiktoken.encoding_for_model("text-embedding-ada-002") 
+    enc=tiktoken.encoding_for_model("text-embedding-3-small") 
     total_tokens=sum([len(enc.encode(page.page_content)) for page in texts]) 
     # print(f"Total Tokens: {total_tokens}") 
     # print(f"Embedding Cost in USD: {total_tokens/1000*0.0004:.6f}")
